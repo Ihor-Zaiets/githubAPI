@@ -1,11 +1,18 @@
 package com.IhorZaiets.githubAPI.modules.github;
 
+import com.IhorZaiets.githubAPI.exceptions.ExceptionMessage;
+import com.IhorZaiets.githubAPI.exceptions.ResourceNotFoundException;
 import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryBranchDTO;
-import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryInfoRequestDTO;
 import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryInfoDTO;
+import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryInfoRequestDTO;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -26,6 +33,7 @@ public class GitHubService {
     public static final String GITHUB_API_URL = "https://api.github.com";
 
     public List<RepositoryInfoDTO> getUserRepositoriesInfo(RepositoryInfoRequestDTO repositoryInfoRequestDTO) {
+        validateRequest(repositoryInfoRequestDTO);
         List<RepositoryInfoDTO> repositoryInfoDTOS = new ArrayList<>();
         List<Map<String, Object>> repositoriesListResponse = getRepositoriesFromGitHub(repositoryInfoRequestDTO);
         for (Map<String, Object> repository : repositoriesListResponse) {
@@ -47,6 +55,16 @@ public class GitHubService {
             repositoryInfoDTOS.add(repositoryInfoDTO);
         }
         return repositoryInfoDTOS;
+    }
+
+    private void validateRequest(RepositoryInfoRequestDTO repositoryInfoRequestDTO) {
+        WebClient webClient = WebClient.create(GITHUB_API_URL + "/users/" + repositoryInfoRequestDTO.getUsername());
+        webClient.get()
+                .retrieve()
+                .onStatus(statusCode -> statusCode.equals(HttpStatus.NOT_FOUND), response -> Mono.error(new ResourceNotFoundException(ExceptionMessage.USER_NOT_FOUND)))
+                .onStatus(HttpStatusCode::isError, response -> Mono.error(new RuntimeException(ExceptionMessage.CONTACT_ADMINISTRATOR)))
+                .bodyToMono(String.class)
+                .block();
     }
 
     private static List<Map<String, Object>> getBranchesForRepositoryFromGitHub(RepositoryInfoRequestDTO repositoryInfoRequestDTO, String repositoryName) {
