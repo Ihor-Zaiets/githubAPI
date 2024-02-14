@@ -5,15 +5,11 @@ import com.IhorZaiets.githubAPI.exceptions.ResourceNotFoundException;
 import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryBranchDTO;
 import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryInfoDTO;
 import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryInfoRequestDTO;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientException;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -24,12 +20,13 @@ import java.util.Map;
 @Service
 public class GitHubService {
 
-    public static final String REPOSITORY_NAME_PROPERTY_NAME = "name";
-    public static final String REPOSITORY_OWNER_PROPERTY_NAME = "owner";
-    public static final String OWNER_USERNAME_PROPERTY_NAME = "login";
-    public static final String BRANCH_NAME_PROPERTY_NAME = "name";
-    public static final String BRANCH_LAST_COMMIT_PROPERTY_NAME = "commit";
-    public static final String LAST_COMMIT_SHA_PROPERTY_NAME = "sha";
+    public static final String REPOSITORY_PROPERTY_NAME_NAME = "name";
+    public static final String REPOSITORY_PROPERTY_NAME_OWNER = "owner";
+    public static final String REPOSITORY_PROPERTY_NAME_IS_FORK = "fork";
+    public static final String OWNER_PROPERTY_NAME_USERNAME = "login";
+    public static final String BRANCH_PROPERTY_NAME_NAME = "name";
+    public static final String BRANCH_PROPERTY_NAME_LAST_COMMIT = "commit";
+    public static final String LAST_COMMIT_PROPERTY_NAME_SHA = "sha";
 
     private static String GITHUB_API_URL = "https://api.github.com";
 
@@ -46,22 +43,24 @@ public class GitHubService {
         List<RepositoryInfoDTO> repositoryInfoDTOS = new ArrayList<>();
         List<Map<String, Object>> repositoriesListResponse = getRepositoriesFromGitHub(repositoryInfoRequestDTO);
         for (Map<String, Object> repository : repositoriesListResponse) {
-            RepositoryInfoDTO repositoryInfoDTO = new RepositoryInfoDTO();
-            List<RepositoryBranchDTO> repositoryBranchDTOS = new ArrayList<>();
-            String repositoryName = repository.get(REPOSITORY_NAME_PROPERTY_NAME).toString();
-            LinkedHashMap<String, Object> owner = (LinkedHashMap<String, Object>) repository.get(REPOSITORY_OWNER_PROPERTY_NAME);
-            List<Map<String, Object>> branchesListResponse = getBranchesForRepositoryFromGitHub(repositoryInfoRequestDTO, repositoryName);
-            for (Map<String, Object> branchResponse : branchesListResponse) {
-                RepositoryBranchDTO repositoryBranchDTO = new RepositoryBranchDTO();
-                LinkedHashMap<String, Object> commit = (LinkedHashMap<String, Object>) branchResponse.get(BRANCH_LAST_COMMIT_PROPERTY_NAME);
-                repositoryBranchDTO.setName(branchResponse.get(BRANCH_NAME_PROPERTY_NAME).toString());
-                repositoryBranchDTO.setLastCommitSHA(commit.get(LAST_COMMIT_SHA_PROPERTY_NAME).toString());
-                repositoryBranchDTOS.add(repositoryBranchDTO);
+            if (!(boolean) repository.get(REPOSITORY_PROPERTY_NAME_IS_FORK)) {
+                RepositoryInfoDTO repositoryInfoDTO = new RepositoryInfoDTO();
+                List<RepositoryBranchDTO> repositoryBranchDTOS = new ArrayList<>();
+                String repositoryName = repository.get(REPOSITORY_PROPERTY_NAME_NAME).toString();
+                LinkedHashMap<String, Object> owner = (LinkedHashMap<String, Object>) repository.get(REPOSITORY_PROPERTY_NAME_OWNER);
+                List<Map<String, Object>> branchesListResponse = getBranchesForRepositoryFromGitHub(repositoryInfoRequestDTO, repositoryName);
+                for (Map<String, Object> branchResponse : branchesListResponse) {
+                    RepositoryBranchDTO repositoryBranchDTO = new RepositoryBranchDTO();
+                    LinkedHashMap<String, Object> commit = (LinkedHashMap<String, Object>) branchResponse.get(BRANCH_PROPERTY_NAME_LAST_COMMIT);
+                    repositoryBranchDTO.setName(branchResponse.get(BRANCH_PROPERTY_NAME_NAME).toString());
+                    repositoryBranchDTO.setLastCommitSHA(commit.get(LAST_COMMIT_PROPERTY_NAME_SHA).toString());
+                    repositoryBranchDTOS.add(repositoryBranchDTO);
+                }
+                repositoryInfoDTO.setName(repositoryName);
+                repositoryInfoDTO.setOwnerUsername(owner.get(OWNER_PROPERTY_NAME_USERNAME).toString());
+                repositoryInfoDTO.setRepositoryBranchList(repositoryBranchDTOS);
+                repositoryInfoDTOS.add(repositoryInfoDTO);
             }
-            repositoryInfoDTO.setName(repositoryName);
-            repositoryInfoDTO.setOwnerUsername(owner.get(OWNER_USERNAME_PROPERTY_NAME).toString());
-            repositoryInfoDTO.setRepositoryBranchList(repositoryBranchDTOS);
-            repositoryInfoDTOS.add(repositoryInfoDTO);
         }
         return repositoryInfoDTOS;
     }
