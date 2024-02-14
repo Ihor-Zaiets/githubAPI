@@ -1,3 +1,20 @@
+# Project description
+This app is used to send requests to GitHub API to retrieve data about user's repositories and its branches.
+
+## Setup
+Application does not save any data and does not have any datasource. It is enough to download code and maven dependencies
+and application is ready to go. By default, Tomcat server is running on localhost and listening on port 8080. You can
+change that by uncommenting port property <code>#server.port=8081</code> in <code>application.properties</code> file.
+
+## Usage
+Application's API is presented as one endpoint: <code>POST</code><code>/api/github/getUserRepInfo</code>. This endpoint
+consumes application/json content type and request body should contain GitHub user username. For given username 
+application will return all repositories, which are not forks. For each repository its names, owner username and list of branches.
+
+## Exceptions
+If user with given name does not exist, application will return status code 404 <code>NOT_FOUND</code>. For any other 
+exception application will return 500 <code>INTERNAL_SERVER_ERROR</code> and asks to contact administrator.
+
 ## My thought process
 
 10.02.2024
@@ -8,16 +25,6 @@ but also my thought process behind this.
 
 As I understood assigment, there is GitHub api. My application should use this api to retrieve information from GitHub
 with given parameters. I started from using spring.io to set up a project.
-
-This assignment was for juniors. If I pretend to have a higher skills than juniors, I guess I should do something more
-than just written assigment. It was said, that to keep honesty of recruitment process, questions about assigment won't be
-answered. Therefore, I should decide what to do myself. There was no requirement of saving data to database, but using
-external API. Then, I would consider this a main focus. Therefore, from two ideas I currently have: add saving to database
-and add authorization to retrieve more data from GitHub, I choose the second. I also want to do second option more,
-because I already quite good at creating entities, dtos, a dozen mappers, 
-repositories and services to set up CRUD business logic.
-But I barely never used external API in my application and also had problems with Spring Security and tokens 
-last time I used it.
 
 #### "If you only do what you can do, you'll never be more than you are now".
 
@@ -69,3 +76,13 @@ for it.
 Today I finally finished exception handling. Creating exceptions and handle them globally is something i have done before.
 So that was easy. The main problem for me was handling exception send by GitHub API, because i somehow should've used
 available methods in Spring WebClient to throw my custom exception. After 2 days of googling i finally made it.
+
+14.02.2024
+
+Today I decided to write tests. I understood, why i couldn't figure out, how to write tests using TDD. In the past, 
+i was using Mock and JUnit5 to mock class dependencies and methods behavior, but in this case i was asking myself, how to mock
+external API response? And that was a very good question which i googled later and found out. I needed to use MockWebServer
+to mock external API. While i was writing this test, i noticed, how i being stuck at the smallest of things. I guess,
+that is one of those moment, when you should just let it be. i couldn't make it work. For some reason, during test,
+request sends and loading is never ends. Maybe it's not good to left broken code in assigment, but i consider this be better,
+than nothing.
