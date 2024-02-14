@@ -7,11 +7,7 @@ purposes, to give employers an opportunity to see, not only what code I was able
 but also my thought process behind this.
 
 As I understood assigment, there is GitHub api. My application should use this api to retrieve information from GitHub
-with given parameters. I started from using spring.io to set up a project. 
-Added spring web and spring jpa, although there was no word about
-saving any data into database in assigment, I added spring jpa just because how used to this I am. 
-Spring web for web development.
-Spring JPA for saving and reading data to\form database.
+with given parameters. I started from using spring.io to set up a project.
 
 This assignment was for juniors. If I pretend to have a higher skills than juniors, I guess I should do something more
 than just written assigment. It was said, that to keep honesty of recruitment process, questions about assigment won't be
@@ -36,7 +32,7 @@ Also, a couple of notes:
 constructors. I tried both constructors and fields. Using it on fields is very simple and straightforward, but constructor
 is just a pain. I didn't notice any problems with field injection and constructor injections was working just as fine.
 But managing constructor injections is a drastically more work.
-2. I know it's better to create interface, declare method there and then create its implementations. In such way application
+2. I know it's better to create interface, declare methods there and then create its implementations. In such way application
 is much more flexible, and you can later just change implementation in case of a problem. On the other hand, there is no need
 to create an interface and then only 1 implementation according to KISS(~~keep it simple, stupid~~ keep it super simple), that's
 why I wrote implementations without interfaces straight ahead.
@@ -59,3 +55,17 @@ So my goal is to deserialize JSON into my DTO object. I had this in my project a
 correctly, so i never had any experience with it. So, i have doubts, i wrote this in the best way possible, but i managed to
 do this too. I used Postman to send requests to GitHub API to see, what kind of data does it return.
 
+Okay, i finished a main part of assigment, sending requests and retrieving required data is working correctly. It's made
+in test class, but transfer it to service is 10 seconds thing. What i really need to do, is add validations, exceptions
+and i'd really want to write it using TDD, but i just don't know, how to write this test. I noticed, that, maybe, it's 
+a good practise, to write code using TDD, but it's really hard to write test for business logic if i have no idea, how
+it should work.
+
+My attempts to use TDD is greatly slowing me down, so i decided to wrote code and then create tests
+for it.
+
+13.02.2024
+
+Today I finally finished exception handling. Creating exceptions and handle them globally is something i have done before.
+So that was easy. The main problem for me was handling exception send by GitHub API, because i somehow should've used
+available methods in Spring WebClient to throw my custom exception. After 2 days of googling i finally made it.
