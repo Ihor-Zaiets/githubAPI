@@ -5,6 +5,7 @@ import com.IhorZaiets.githubAPI.exceptions.ResourceNotFoundException;
 import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryBranchDTO;
 import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryInfoDTO;
 import com.IhorZaiets.githubAPI.modules.github.dto.RepositoryInfoRequestDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -30,7 +31,15 @@ public class GitHubService {
     public static final String BRANCH_LAST_COMMIT_PROPERTY_NAME = "commit";
     public static final String LAST_COMMIT_SHA_PROPERTY_NAME = "sha";
 
-    public static final String GITHUB_API_URL = "https://api.github.com";
+    private static String GITHUB_API_URL = "https://api.github.com";
+
+    public static String getGithubApiUrl() {
+        return GITHUB_API_URL;
+    }
+
+    public static void setGithubApiUrl(String githubApiUrl) {
+        GITHUB_API_URL = githubApiUrl;
+    }
 
     public List<RepositoryInfoDTO> getUserRepositoriesInfo(RepositoryInfoRequestDTO repositoryInfoRequestDTO) {
         validateRequest(repositoryInfoRequestDTO);
