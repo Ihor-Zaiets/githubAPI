@@ -1,6 +1,7 @@
 package com.ihorzaiets.githubapi.module.githubapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ihorzaiets.githubapi.exception.UserNotFoundException;
 import com.ihorzaiets.githubapi.module.githubapi.dto.GithubRepositoryBranchDTO;
 import com.ihorzaiets.githubapi.module.githubapi.dto.GithubRepositoryDTO;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,8 @@ public class GithubClient {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
+        if(response.statusCode() == 404)
+            throw new UserNotFoundException();
 
         return mapper.readValue(
                 response.body(),
