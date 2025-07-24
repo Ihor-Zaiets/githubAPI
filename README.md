@@ -12,5 +12,9 @@ consumes username as path variable. For given username
 application will return all repositories, which are not forks. For each repository its name, owner login and list of branches.
 For each branch its name and last commit sha.
 
+Beware, application doesn't implement any authorization to GitHub, therefore GitHub will allow only 50 requests per hour
+for one IP. Test in application doesn't mock GitHub response, so running test will also consume available requests to 
+GitHub API.
+
 ## Exceptions
 If user with given name does not exist, application will return status code <code>404</code> <code>NOT_FOUND</code>.
