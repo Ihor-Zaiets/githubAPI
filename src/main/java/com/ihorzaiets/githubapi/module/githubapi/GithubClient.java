@@ -2,6 +2,8 @@ package com.ihorzaiets.githubapi.module.githubapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ihorzaiets.githubapi.exception.UserNotFoundException;
+import com.ihorzaiets.githubapi.module.githubapi.dto.GithubApiBranchResponseDTO;
+import com.ihorzaiets.githubapi.module.githubapi.dto.GithubApiRepositoryResponseDTO;
 import com.ihorzaiets.githubapi.module.githubapi.dto.GithubRepositoryBranchDTO;
 import com.ihorzaiets.githubapi.module.githubapi.dto.GithubRepositoryDTO;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,7 @@ public class GithubClient {
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public List<GithubRepositoryDTO> getUserRepositories(String username) throws IOException, InterruptedException {
+    public List<GithubApiRepositoryResponseDTO> getUserRepositories(String username) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("%s/users/%s/repos".formatted(GITHUB_URL, username)))
                 .header("Accept", "application/vnd.github+json")
@@ -34,11 +36,11 @@ public class GithubClient {
 
         return mapper.readValue(
                 response.body(),
-                mapper.getTypeFactory().constructCollectionType(List.class, GithubRepositoryDTO.class)
+                mapper.getTypeFactory().constructCollectionType(List.class, GithubApiRepositoryResponseDTO.class)
         );
     }
 
-    public List<GithubRepositoryBranchDTO> getUserRepositoryBranches(String username, String repositoryName) throws IOException, InterruptedException {
+    public List<GithubApiBranchResponseDTO> getUserRepositoryBranches(String username, String repositoryName) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("%s/repos/%s/%s/branches".formatted(GITHUB_URL, username, repositoryName)))
                 .header("Accept", "application/vnd.github+json")
@@ -48,7 +50,7 @@ public class GithubClient {
 
         return mapper.readValue(
                 response.body(),
-                mapper.getTypeFactory().constructCollectionType(List.class, GithubRepositoryBranchDTO.class)
+                mapper.getTypeFactory().constructCollectionType(List.class, GithubApiBranchResponseDTO.class)
         );
     }
 }
